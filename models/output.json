@@ -1,0 +1,16 @@
+[
+    {
+        "session_id": "s_anom_bot",
+        "visitor_id": "u_bot_001",
+        "anomaly": true,
+        "risk_level": "low",
+        "anomaly_score": -0.04767103382306914,
+        "anomaly_type": "ml_detected_anomaly",
+        "flags": {
+            "ml": true,
+            "bot": false,
+            "data_issue": false,
+            "rule": false
+        }
+    }
+]

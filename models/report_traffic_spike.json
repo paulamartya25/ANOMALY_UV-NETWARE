@@ -1,0 +1,13 @@
+{
+    "report_type": "Traffic Spike/Drop Anomaly",
+    "generated_at": "2026-04-07 00:19:35",
+    "metrics": {
+        "hour_12": {
+            "status": "DROP",
+            "historical_avg": 417,
+            "current_traffic": 1,
+            "percent_change": -99.76,
+            "anomaly": true
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "report_type": "Conversion Drop Alerts (ML Prediction)",
+    "generated_at": "2026-04-07 00:19:35",
+    "model_used": "LogisticRegression",
+    "historical_conversion_rate": 11.35,
+    "actual_current_conversion_rate": 0.0,
+    "model_predicted_conversion_rate": 2.1,
+    "actual_conversion_drop_percent": 11.35,
+    "model_predicted_drop_percent": 9.25,
+    "actual_alert_level": "HIGH",
+    "model_alert_level": "HIGH",
+    "sessions_analyzed": 1,
+    "sessions_actually_converted": 0,
+    "sessions_model_predicted_high_conversion": 0,
+    "session_details": [
+        {
+            "session_id": "s_test_001",
+            "visitor_id": "u_101",
+            "actual_converted": false,
+            "predicted_conversion_probability": 0.020987670586757334,
+            "predicted_likelihood": "LOW"
+        }
+    ]
+}

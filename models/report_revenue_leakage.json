@@ -1,0 +1,11 @@
+{
+    "report_type": "Revenue Leakage Detection (ML-Based)",
+    "generated_at": "2026-04-07 00:19:35",
+    "model_used": "LogisticRegression (Conversion Prediction)",
+    "total_sessions": 1,
+    "leakage_risk_sessions": 0,
+    "critical_leakage_sessions": 0,
+    "medium_leakage_sessions": 0,
+    "estimated_lost_opportunity_sessions": 0,
+    "indicators": []
+}

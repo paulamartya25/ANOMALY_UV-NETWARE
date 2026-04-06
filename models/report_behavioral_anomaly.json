@@ -1,0 +1,20 @@
+{
+    "report_type": "Behavioral Anomaly Detection (ML Model)",
+    "generated_at": "2026-04-07 00:19:35",
+    "model_used": "IsolationForest",
+    "total_sessions_analyzed": 1,
+    "anomalous_sessions": 1,
+    "anomaly_rate_percent": 100.0,
+    "high_risk_anomalies": 1,
+    "medium_risk_anomalies": 0,
+    "detections": [
+        {
+            "session_id": "s_test_001",
+            "visitor_id": "u_101",
+            "is_anomalous": true,
+            "anomaly_score": -0.5569373652730845,
+            "risk_level": "HIGH",
+            "behavioral_pattern": "ANOMALOUS - Deviates from normal user behavior"
+        }
+    ]
+}

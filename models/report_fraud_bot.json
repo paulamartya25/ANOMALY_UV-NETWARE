@@ -1,0 +1,11 @@
+{
+    "report_type": "Fraud / Bot Traffic Detection (ML Model)",
+    "generated_at": "2026-04-07 00:19:35",
+    "model_used": "RandomForestClassifier",
+    "total_sessions_analyzed": 1,
+    "fraudulent_sessions": 0,
+    "fraud_rate_percent": 0.0,
+    "detections": [],
+    "high_confidence_fraud": 0,
+    "medium_confidence_fraud": 0
+}

@@ -1,0 +1,10 @@
+{
+    "report_type": "Data Integrity & Tracking Issues Report",
+    "generated_at": "2026-04-07 00:19:35",
+    "total_sessions_checked": 1,
+    "sessions_with_issues": 0,
+    "critical_issues": 0,
+    "warning_issues": 0,
+    "data_quality_score": 100.0,
+    "issues": []
+}

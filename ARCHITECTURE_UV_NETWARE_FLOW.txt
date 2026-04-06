@@ -1,0 +1,43 @@
+┌─────────────────────────────────────────────────────────────────────┐
+│                         INPUT (input.json)                          │
+│               Sessions from your website/app today                   │
+└──────────────────────┬──────────────────────────────────────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+        ▼              ▼              ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐
+│  ANOMALY     │ │    FRAUD     │ │   CONVERSION         │
+│ DETECTION    │ │  DETECTION   │ │   PREDICTION         │
+│              │ │              │ │                      │
+│ Isolation    │ │ Random       │ │ Logistic             │
+│ Forest       │ │ Forest       │ │ Regression           │
+└──────┬───────┘ └──────┬───────┘ └──────┬───────────────┘
+       │                │                │
+       │ Predictions    │ Predictions    │ Probabilities
+       │ (Normal/       │ (Fraud/        │ (0-1 conversion
+       │  Anomalous)    │  Legitimate)   │  likelihood)
+       │                │                │
+       └────────────────┼────────────────┘
+                        │
+                        ▼
+         ┌──────────────────────────────┐
+         │      REPORTS.PY              │
+         │  (Combines all predictions)  │
+         └──────────────────────────────┘
+                        │
+        ┌───────────────┼───────────────┬──────────────┐
+        │               │               │              │
+        ▼               ▼               ▼              ▼
+┌───────────────┐ ┌───────────────┐ ┌──────────────┐ ┌──────────────┐
+│  Report 1:    │ │  Report 2:    │ │  Report 3:   │ │  Report 4:   │
+│ BEHAVIORAL    │ │  FRAUD        │ │ CONVERSION   │ │ REVENUE      │
+│ ANOMALIES     │ │  DETECTION    │ │ DROP ALERTS  │ │ LEAKAGE      │
+│               │ │ (ML-based)    │ │ (Predicted)  │ │ (ML-based)   │
+│ "1 anomalous" │ │ "0 fraud"     │ │ "11.35% drop"│ │ "0 leakage"  │
+└───────────────┘ └───────────────┘ └──────────────┘ └──────────────┘
+
+                ⬇️ SAVED AS ⬇️
+
+     📊 combined_report.json
+     📋 "Daily Report for April 7, 2026"

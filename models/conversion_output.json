@@ -1,0 +1,9 @@
+[
+    {
+        "session_id": "s_test_001",
+        "visitor_id": "u_101",
+        "will_convert": false,
+        "conversion_probability": 0.0061,
+        "conversion_likelihood": "LOW"
+    }
+]
