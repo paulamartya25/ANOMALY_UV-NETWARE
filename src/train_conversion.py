@@ -3,11 +3,14 @@ import numpy as np
 import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_score, confusion_matrix
+import json
 
 # ==============================
 # 1. LOAD DATA
 # ==============================
-DATA_PATH = "../data/analytics_dataset_10k.csv"
+DATA_PATH = "data/analytics_dataset_10k.csv"
 
 df = pd.read_csv(DATA_PATH)
 df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -66,28 +69,80 @@ X = X[mask]
 y = y[mask]
 
 # ==============================
-# 4. SCALE DATA
+# 4. TRAIN/TEST SPLIT
+# ==============================
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# ==============================
+# 5. SCALE DATA
 # ==============================
 
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
 print("Scaling Completed")
 
 # ==============================
-# 5. TRAIN MODEL
+# 6. TRAIN MODEL
 # ==============================
 
 model = LogisticRegression(max_iter=1000, random_state=42)
-model.fit(X_scaled, y)
+model.fit(X_train_scaled, y_train)
 
 print("Model Training Completed")
 
 # ==============================
-# 6. SAVE MODEL + SCALER
+# 7. CALCULATE METRICS
+# ==============================
+y_pred = model.predict(X_test_scaled)
+
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0)
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+
+metrics = {
+    "model": "Conversion Prediction (Logistic Regression)",
+    "accuracy": round(accuracy, 4),
+    "precision": round(precision, 4),
+    "recall": round(recall, 4),
+    "f1_score": round(f1, 4),
+    "confusion_matrix": {
+        "true_negatives": int(tn),
+        "false_positives": int(fp),
+        "false_negatives": int(fn),
+        "true_positives": int(tp)
+    },
+    "test_samples": len(y_test),
+    "training_samples": len(y_train)
+}
+
+# ==============================
+# 8. SAVE MODEL + SCALER
 # ==============================
 
-joblib.dump(model, "../models/conversion_model.pkl")
-joblib.dump(scaler, "../models/conversion_scaler.pkl")
+joblib.dump(model, "models/conversion_model.pkl")
+joblib.dump(scaler, "models/conversion_scaler.pkl")
 
-print("✅ Conversion model and scaler saved successfully")
+# ==============================
+# 9. SAVE METRICS
+# ==============================
+with open("models/conversion_metrics.json", "w") as f:
+    json.dump(metrics, f, indent=4)
+
+print("\n[SUCCESS] Conversion Model Training Complete")
+print("=" * 50)
+print(f"Accuracy:  {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall:    {recall:.4f}")
+print(f"F1 Score:  {f1:.4f}")
+print("=" * 50)
+print(f"True Positives:  {tp}")
+print(f"True Negatives:  {tn}")
+print(f"False Positives: {fp}")
+print(f"False Negatives: {fn}")
+print("=" * 50)
+print("[INFO] Conversion model and scaler saved successfully")
+print("[INFO] Metrics saved to conversion_metrics.json")

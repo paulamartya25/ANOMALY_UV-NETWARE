@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 # ==============================
 # 1. LOAD DATA
 # ==============================
-DATA_PATH = "../data/analytics_dataset_10k.csv"
+DATA_PATH = "data/analytics_dataset_10k.csv"
 
 df = pd.read_csv(DATA_PATH)
 

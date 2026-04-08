@@ -1,42 +1,46 @@
+#!/usr/bin/env python3
+"""
+TEST CONVERSION MODEL ONLY
+Run this to test ONLY the Conversion Prediction model
+Does NOT retrain - uses saved model
+"""
+
 import pandas as pd
 import joblib
 import json
 
 # ==============================
-# 1. LOAD MODEL & SCALER
+# 1. LOAD SAVED MODEL & SCALER (NO TRAINING)
 # ==============================
+print("\n[LOADING] Conversion Prediction Model...\n")
 model = joblib.load("models/conversion_model.pkl")
 scaler = joblib.load("models/conversion_scaler.pkl")
 
 # ==============================
-# 2. LOAD DATASET (HISTORICAL)
+# 2. LOAD DATA FOR PREDICTIONS
 # ==============================
 full_df = pd.read_csv("data/analytics_dataset_10k.csv")
 full_df['timestamp'] = pd.to_datetime(full_df['timestamp'])
 
-# ==============================
-# 3. LOAD INPUT JSON
-# ==============================
 with open("data/input.json", "r") as f:
     input_data = json.load(f)
 
 input_df = pd.DataFrame(input_data)
 input_df['timestamp'] = pd.to_datetime(input_df['timestamp'])
 
-# Mark new rows
+# Mark rows
 input_df["is_new"] = True
 full_df["is_new"] = False
 
 # ==============================
-# 4. COMBINE DATA
+# 3. COMBINE DATA
 # ==============================
 df = pd.concat([full_df, input_df], ignore_index=True)
 
 # ==============================
-# 5. FEATURE ENGINEERING (SAME AS TRAINING)
+# 4. FEATURE ENGINEERING (SAME AS TRAINING)
 # ==============================
 
-# Visitor-level stats
 visitor_stats = df.groupby("visitor_id").agg({
     "session_id": "count",
     "session_duration": "mean",
@@ -51,17 +55,15 @@ visitor_stats = df.groupby("visitor_id").agg({
 
 df = df.merge(visitor_stats, on="visitor_id", how="left")
 
-# Time features
 df['hour'] = df['timestamp'].dt.hour
 df['day_of_week'] = df['timestamp'].dt.dayofweek
 
-# Behavioral features
 df['click_rate'] = df['clicks'] / (df['session_duration'] + 1)
 df['events_per_click'] = df['events_count'] / (df['clicks'] + 1)
 df['pages_per_session'] = df['pages_viewed'] / (df['session_duration'] + 1)
 
 # ==============================
-# 6. SELECT FEATURES
+# 5. SELECT FEATURES
 # ==============================
 features = [
     "session_duration", "pages_viewed", "scroll_depth",
@@ -75,24 +77,19 @@ features = [
 X = df[features]
 
 # ==============================
-# 7. SCALE + PREDICT
+# 6. SCALE + PREDICT
 # ==============================
 X_scaled = scaler.transform(X)
 
-# Get conversion probability (0 = not convert, 1 = will convert)
 df['conversion_prediction'] = model.predict(X_scaled)
-df['conversion_probability'] = model.predict_proba(X_scaled)[:, 1]  # Probability of conversion
+df['conversion_probability'] = model.predict_proba(X_scaled)[:, 1]
 
 # ==============================
-# 8. EXTRACT ONLY INPUT RESULTS
+# 7. EXTRACT RESULTS
 # ==============================
 result_df = df[df["is_new"] == True]
 
-# ==============================
-# 9. CREATE OUTPUT JSON
-# ==============================
 output = []
-
 for _, row in result_df.iterrows():
     output.append({
         "session_id": row["session_id"],
@@ -102,53 +99,52 @@ for _, row in result_df.iterrows():
         "conversion_likelihood": "HIGH" if row["conversion_probability"] > 0.7 else ("MEDIUM" if row["conversion_probability"] > 0.4 else "LOW")
     })
 
-# Save output
 with open("models/conversion_output.json", "w") as f:
     json.dump(output, f, indent=4)
 
 # ==============================
-# 10. LOAD & DISPLAY MODEL METRICS
+# 8. LOAD & DISPLAY METRICS
 # ==============================
 try:
     with open("models/conversion_metrics.json", "r") as f:
         metrics = json.load(f)
     
-    print("\n" + "="*70)
-    print("[MODEL PERFORMANCE METRICS]".center(70))
-    print("="*70)
+    print("\n" + "="*80)
+    print("[MODEL PERFORMANCE METRICS]".center(80))
+    print("="*80)
     print(f"\nModel: {metrics['model']}")
     print(f"Training Samples: {metrics['training_samples']} | Test Samples: {metrics['test_samples']}")
-    print("\nAccuracy Metrics:")
-    print(f"  • Accuracy:  {metrics['accuracy']:.4f} ({metrics['accuracy']*100:.2f}%)")
-    print(f"  • Precision: {metrics['precision']:.4f}")
-    print(f"  • Recall:    {metrics['recall']:.4f}")
-    print(f"  • F1 Score:  {metrics['f1_score']:.4f}")
+    print("\n[ACCURACY METRICS]")
+    print(f"  Accuracy:  {metrics['accuracy']:.4f} ({metrics['accuracy']*100:.2f}%)")
+    print(f"  Precision: {metrics['precision']:.4f}")
+    print(f"  Recall:    {metrics['recall']:.4f}")
+    print(f"  F1 Score:  {metrics['f1_score']:.4f}")
     
     cm = metrics['confusion_matrix']
-    print("\nConfusion Matrix:")
-    print(f"  • True Positives:  {cm['true_positives']}")
-    print(f"  • True Negatives:  {cm['true_negatives']}")
-    print(f"  • False Positives: {cm['false_positives']}")
-    print(f"  • False Negatives: {cm['false_negatives']}")
-    print("="*70)
+    print("\n[CONFUSION MATRIX]")
+    print(f"  True Positives:  {cm['true_positives']}")
+    print(f"  True Negatives:  {cm['true_negatives']}")
+    print(f"  False Positives: {cm['false_positives']}")
+    print(f"  False Negatives: {cm['false_negatives']}")
+    print("="*80)
 except Exception as e:
     print(f"\n[WARNING] Could not load metrics: {e}")
 
 # ==============================
-# 11. PRINT PREDICTIONS
+# 9. PRINT PREDICTIONS
 # ==============================
-print("\n" + "="*70)
-print("[CONVERSION PREDICTION RESULTS]".center(70))
-print("="*70)
+print("\n" + "="*80)
+print("[CONVERSION PREDICTION RESULTS]".center(80))
+print("="*80)
 
 for item in output:
     print(f"\nSession: {item['session_id']} | Visitor: {item['visitor_id']}")
-    print(f"  • Will Convert: {item['will_convert']}")
-    print(f"  • Probability: {item['conversion_probability']*100:.2f}%")
-    print(f"  • Likelihood: {item['conversion_likelihood']}")
+    print(f"  Will Convert: {item['will_convert']}")
+    print(f"  Probability: {item['conversion_probability']*100:.2f}%")
+    print(f"  Likelihood: {item['conversion_likelihood']}")
 
-print("\n" + "="*70)
-print(f"Total Sessions Analyzed: {len(output)}")
+print("\n" + "="*80)
+print(f"Total Sessions: {len(output)}")
 print(f"Predicted to Convert: {sum([1 for x in output if x['will_convert']])}")
 print(f"Average Conversion Probability: {sum([x['conversion_probability'] for x in output])/len(output)*100:.2f}%")
-print("="*70 + "\n")
+print("="*80 + "\n")

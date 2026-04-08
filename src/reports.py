@@ -14,6 +14,7 @@ class AnomalyReporter:
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.models = self._load_models()
         self.data = self._load_data()
+        self.metrics = self._load_metrics()
         self.reports = {}
     
     def _load_models(self):
@@ -46,6 +47,23 @@ class AnomalyReporter:
         except Exception as e:
             print(f"❌ Error loading data: {e}")
             return None
+    
+    def _load_metrics(self):
+        """Load model performance metrics"""
+        metrics = {}
+        try:
+            with open("../models/fraud_metrics.json") as f:
+                metrics['fraud'] = json.load(f)
+        except Exception as e:
+            print(f"⚠️  Fraud metrics not available: {e}")
+        
+        try:
+            with open("../models/conversion_metrics.json") as f:
+                metrics['conversion'] = json.load(f)
+        except Exception as e:
+            print(f"⚠️  Conversion metrics not available: {e}")
+        
+        return metrics
     
     # ==============================
     # FEATURE ENGINEERING FOR MODELS
@@ -213,11 +231,11 @@ class AnomalyReporter:
             "fraud_rate_percent": round((len(fraud_indicators) / len(df)) * 100, 2) if len(df) > 0 else 0,
             "detections": fraud_indicators,
             "high_confidence_fraud": len([x for x in fraud_indicators if x['fraud_confidence'] == 'HIGH']),
-            "medium_confidence_fraud": len([x for x in fraud_indicators if x['fraud_confidence'] == 'MEDIUM'])
+            "medium_confidence_fraud": len([x for x in fraud_indicators if x['fraud_confidence'] == 'MEDIUM']),
+            "model_performance": self.metrics.get('fraud', {})
         }
         
         self.reports['fraud_bot'] = report
-        return report
         return report
     
     # ==============================
@@ -294,7 +312,8 @@ class AnomalyReporter:
             "sessions_analyzed": len(curr),
             "sessions_actually_converted": len(curr[curr['converted'] == True]),
             "sessions_model_predicted_high_conversion": len([x for x in conversion_details if x['predicted_likelihood'] == 'HIGH']),
-            "session_details": conversion_details
+            "session_details": conversion_details,
+            "model_performance": self.metrics.get('conversion', {})
         }
         
         self.reports['conversion_drop'] = report
