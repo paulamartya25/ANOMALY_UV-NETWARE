@@ -4,7 +4,7 @@ print("\n" + "="*80)
 print("[CONVERSION PREDICTION MODEL - METRICS TEST]".center(80))
 print("="*80)
 
-try:
+try:   
     with open("models/conversion_metrics.json", "r") as f:
         metrics = json.load(f)
     
